@@ -10,7 +10,7 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-from schemas.Enum import Priority, Status
+from schemas.enum import Priority, Status
 
 
 # revision identifiers, used by Alembic.
