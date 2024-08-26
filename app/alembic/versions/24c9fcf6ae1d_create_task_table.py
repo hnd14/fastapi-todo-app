@@ -26,6 +26,8 @@ def upgrade() -> None:
                     sa.Column("summary", sa.String),
                     sa.Column("status", sa.Enum(Status), nullable=False),
                     sa.Column("priority", sa.Enum(Priority), nullable=False),
+                    sa.Column("created_at", sa.DateTime, nullable=False),
+                    sa.Column("updated_at", sa.DateTime, nullable=False),
                     sa.Column("created_by_id", sa.Uuid, nullable=False))
     op.create_foreign_key("fk_tasks_user", "tasks", "users", ["created_by_id"], ["id"])
 

@@ -28,6 +28,8 @@ def upgrade() -> None:
                     sa.Column("hashed_password", sa.String, nullable=False),
                     sa.Column("is_active", sa.Boolean, nullable=False),
                     sa.Column("is_admin", sa.Boolean, nullable=False),
+                    sa.Column("created_at", sa.DateTime, nullable=False),
+                    sa.Column("updated_at", sa.DateTime, nullable=False),
                     sa.Column("company_id", sa.Uuid, nullable=False))
     op.create_foreign_key("fk_users_comp", "users", "companies", ["company_id"], ["id"])
 

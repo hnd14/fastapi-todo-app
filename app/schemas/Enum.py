@@ -12,4 +12,11 @@ class Status(Enum):
     RESOLVED = "Resolved"
     CLOSED = "Closed"
     ABANDONED = "Abandoned"
+    
+class Mode(Enum):
+    ON_SITE = "On site"
+    REMOTE = "Remote"
+    HYBRID = "Hybrid"
+    SYSTEM = "System"
+    
      
