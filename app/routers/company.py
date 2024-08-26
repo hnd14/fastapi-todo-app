@@ -1,9 +1,11 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from services import  company as CompanyService 
 from models.company import CompanyViewModel, CompanyPostModel
 from database import get_db_context
+from exception import ResourceNotFoundException
 
 router = APIRouter(prefix="/companies", tags=["Companies"])
 
@@ -20,3 +22,14 @@ def find_all_company_with_filter(*, search_kw: str = Query(default=""),
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=CompanyViewModel)
 def create_company(request: CompanyPostModel, db: Session = Depends(get_db_context)):
     return CompanyService.create_company(db, request)
+
+@router.put("/{id}", response_model=CompanyViewModel)
+def update_company(id: UUID, request: CompanyPostModel, db: Session = Depends(get_db_context)):
+    return CompanyService.update_company(db, id, request)
+
+@router.get("/{id}", response_model=CompanyViewModel)
+def get_one_company(id: UUID, db: Session = Depends(get_db_context)):
+    company = CompanyService.get_company_by_id(db, id)
+    if company is None:
+        raise ResourceNotFoundException("Company")
+    return company
