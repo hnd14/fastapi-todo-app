@@ -1,0 +1,22 @@
+from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy.orm import Session
+
+from services import  company as CompanyService 
+from models.company import CompanyViewModel, CompanyPostModel
+from database import get_db_context
+
+router = APIRouter(prefix="/companies", tags=["Companies"])
+
+@router.get("")
+def find_all_company_with_filter(*, search_kw: str = Query(default=""),
+                                 page_size: int = Query(default=10, ge=1, le=100),
+                                 page_number: int = Query(default=1, ge=1), 
+                                 db:Session = Depends(get_db_context)):
+    return CompanyService.find_all_company_with_filter(db, search_kw=search_kw,
+                                        page_number=page_number,
+                                        page_size=page_size,
+                                        )
+    
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=CompanyViewModel)
+def create_company(request: CompanyPostModel, db: Session = Depends(get_db_context)):
+    return CompanyService.create_company(db, request)
