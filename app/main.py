@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 
-from routers import company
+from routers import company, auth
 
 app = FastAPI()
 app.include_router(company.router)
+app.include_router(auth.router)
 
 
 @app.get("/")

@@ -1,5 +1,3 @@
-from typing import Any, Dict
-from typing_extensions import Annotated, Doc
 from fastapi import HTTPException, status
 
 class ResourceNotFoundException(HTTPException):
@@ -9,3 +7,12 @@ class ResourceNotFoundException(HTTPException):
 class InvalidActionException(HTTPException):
     def __init__(self, msg:str) -> None:
         super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
+        
+class JWTTokenException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT Token")
+        
+class AuthenticationFailedException(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, 
+                         detail="Authentication failed. Please double check your username and password.")
