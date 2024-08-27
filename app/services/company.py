@@ -2,7 +2,7 @@ from typing import List
 from uuid import UUID
 from datetime import datetime, timezone
 from sqlalchemy import select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 from models.company import CompanyPostModel
 from schemas import Company
