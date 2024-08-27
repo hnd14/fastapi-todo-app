@@ -27,3 +27,6 @@ ADMIN_DEFAULT_PASSWORD = os.environ.get("DEFAULT_PASSWORD")
 # JWT Setting
 JWT_SECRET = os.environ.get("JWT_SECRET")
 JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM")
+
+# System settings
+SYSTEM_COMPANY_ID = "f8f5a16d-8cee-4360-ba28-bebde9ca8e90"

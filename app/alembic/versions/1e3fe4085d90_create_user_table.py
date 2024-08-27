@@ -6,9 +6,14 @@ Create Date: 2024-08-23 16:06:04.454182
 
 """
 from typing import Sequence, Union
+from uuid import uuid4
+from datetime import datetime, timezone
 
 from alembic import op
 import sqlalchemy as sa
+
+from services.auth import get_hashed_password
+from settings import ADMIN_DEFAULT_PASSWORD, SYSTEM_COMPANY_ID
 
 
 # revision identifiers, used by Alembic.
@@ -19,7 +24,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_table("users",
+    user_table = op.create_table("users",
                     sa.Column("id", sa.Uuid, nullable=False, primary_key=True),
                     sa.Column("email", sa.String, nullable=False),
                     sa.Column("username", sa.String, nullable=False),
@@ -32,6 +37,20 @@ def upgrade() -> None:
                     sa.Column("updated_at", sa.DateTime, nullable=False),
                     sa.Column("company_id", sa.Uuid, nullable=False))
     op.create_foreign_key("fk_users_comp", "users", "companies", ["company_id"], ["id"])
+    
+    op.bulk_insert(user_table, [{
+        "id" : uuid4(),
+        "email": "admin@todoapp.com",
+        "username": "todo_admin",
+        "first_name": "admin",
+        "last_name": "admin",
+        "hashed_password": get_hashed_password(ADMIN_DEFAULT_PASSWORD),
+        "is_admin": True,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc), 
+        "company_id": SYSTEM_COMPANY_ID
+    }])
 
 
 def downgrade() -> None:
