@@ -2,10 +2,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
-from services import  company as CompanyService 
-from models.company import CompanyViewModel, CompanyPostModel
 from database import get_db_context
 from exception import ResourceNotFoundException
+from models.company import CompanyViewModel, CompanyPostModel
+from schemas.user import User
+from services import  company as CompanyService, auth as AuthService
+from services.auth import requires_system_admin
 
 router = APIRouter(prefix="/companies", tags=["Companies"])
 
@@ -19,12 +21,17 @@ def find_all_company_with_filter(*, search_kw: str = Query(default=""),
                                         page_size=page_size,
                                         )
     
+@requires_system_admin    
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=CompanyViewModel)
-def create_company(request: CompanyPostModel, db: Session = Depends(get_db_context)):
+def create_company(request: CompanyPostModel,
+                   db: Session = Depends(get_db_context),
+                   user: User = Depends(AuthService.token_interceptor)):
     return CompanyService.create_company(db, request)
 
+@requires_system_admin
 @router.put("/{id}", response_model=CompanyViewModel)
-def update_company(id: UUID, request: CompanyPostModel, db: Session = Depends(get_db_context)):
+def update_company(id: UUID, request: CompanyPostModel, db: Session = Depends(get_db_context), 
+                   user: User = Depends(AuthService.token_interceptor)):
     return CompanyService.update_company(db, id, request)
 
 @router.get("/{id}", response_model=CompanyViewModel)
@@ -34,6 +41,8 @@ def get_one_company(id: UUID, db: Session = Depends(get_db_context)):
         raise ResourceNotFoundException("Company")
     return company
 
+@requires_system_admin
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
-def delete_company(id: UUID, db: Session = Depends(get_db_context)):
+def delete_company(id: UUID, db: Session = Depends(get_db_context), 
+                   user: User = Depends(AuthService.token_interceptor)):
     CompanyService.delete_company(db, id)

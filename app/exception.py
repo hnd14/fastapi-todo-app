@@ -16,3 +16,8 @@ class AuthenticationFailedException(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, 
                          detail="Authentication failed. Please double check your username and password.")
+        
+class UnauthorizedException(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, 
+                         detail="You don't have permission to use this function.")
