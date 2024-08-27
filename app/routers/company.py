@@ -33,3 +33,7 @@ def get_one_company(id: UUID, db: Session = Depends(get_db_context)):
     if company is None:
         raise ResourceNotFoundException("Company")
     return company
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
+def delete_company(id: UUID, db: Session = Depends(get_db_context)):
+    CompanyService.delete_company(db, id)

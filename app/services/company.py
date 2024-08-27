@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from models.company import CompanyPostModel
 from schemas import Company
-from exception import ResourceNotFoundException
+from exception import ResourceNotFoundException, InvalidActionException
 
 def find_all_company_with_filter(db: Session, /, *, search_kw = "", page_size = 10, page_number = 1) -> List[Company]:
     query = select(Company).where(Company.name.like(f"%{search_kw}%"))\
@@ -45,3 +45,15 @@ def update_company(db: Session, id:UUID, data: CompanyPostModel) -> Company:
     db.refresh(company)
     
     return company
+
+def delete_company(db: Session, id:UUID):
+    company = get_company_by_id(db, id)
+    
+    if company is None:
+        raise ResourceNotFoundException("Company")
+    
+    if len(company.employees)>0:
+        raise InvalidActionException("There are still employees in this company!")
+    
+    db.delete(company)
+    db.commit()
