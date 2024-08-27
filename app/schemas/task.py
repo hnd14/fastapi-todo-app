@@ -14,4 +14,4 @@ class Task(Base, BaseEntity):
     priority = Column(Enum(Priority), nullable=False)
     created_by_id = Column(Uuid, ForeignKey(User.id))
     
-    created_by = relationship(User, back_populates="tasks_created")
+    created_by = relationship("User", back_populates="tasks_created")

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Boolean, Uuid, ForeignKey
-from sqlalchemy.orm import relationship, foreign
+from sqlalchemy.orm import relationship
 
 from schemas.base_entity import BaseEntity
 from schemas.company import Company
@@ -17,5 +17,5 @@ class User(Base, BaseEntity):
     is_admin = Column(Boolean, nullable=False)
     company_id = Column(Uuid, ForeignKey(Company.id))
     
-    company = relationship(Company, back_populates="employees")
+    company = relationship("Company", back_populates="employees")
     tasks_created = relationship("Task", back_populates="created_by")
