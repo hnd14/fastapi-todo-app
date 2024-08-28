@@ -28,8 +28,10 @@ def upgrade() -> None:
                     sa.Column("priority", sa.Enum(Priority), nullable=False),
                     sa.Column("created_at", sa.DateTime, nullable=False),
                     sa.Column("updated_at", sa.DateTime, nullable=False),
-                    sa.Column("created_by_id", sa.Uuid, nullable=False))
-    op.create_foreign_key("fk_tasks_user", "tasks", "users", ["created_by_id"], ["id"])
+                    sa.Column("created_by_id", sa.Uuid, nullable=False),
+                    sa.Column("assigned_to_id", sa.Uuid, nullable=False))
+    op.create_foreign_key("fk_tasks_creator", "tasks", "users", ["created_by_id"], ["id"])
+    op.create_foreign_key("fk_tasks_assignee", "tasks", "users", ["assigned_to_id"], ["id"])
 
 
 def downgrade() -> None:
