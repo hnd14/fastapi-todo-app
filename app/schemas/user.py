@@ -12,7 +12,7 @@ class User(Base, BaseEntity):
     username = Column(String, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    password = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False)
     is_admin = Column(Boolean, nullable=False)
     company_id = Column(Uuid, ForeignKey(Company.id))

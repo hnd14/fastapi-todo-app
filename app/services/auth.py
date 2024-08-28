@@ -28,7 +28,7 @@ def authenticate_user(username: str, password: str, db: Session):
 
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     if not user.is_active:
         return False
