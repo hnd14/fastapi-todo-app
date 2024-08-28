@@ -8,7 +8,7 @@ from schemas.enum import Mode
 class Company(Base, BaseEntity):
     __tablename__ = "companies"
     
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
     mode = Column(Enum(Mode), nullable=True)
     

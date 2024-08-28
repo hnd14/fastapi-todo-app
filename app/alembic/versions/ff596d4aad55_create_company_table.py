@@ -31,6 +31,7 @@ def upgrade() -> None:
                     sa.Column("created_at", sa.DateTime, nullable=False),
                     sa.Column("updated_at", sa.DateTime, nullable=False),
                     )
+    op.create_unique_constraint("uq_company_name", "companies", ["name"])
     
     op.bulk_insert(company_table, [
         {
