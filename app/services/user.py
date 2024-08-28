@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from exception import DuplicatedResourceException, UnknownException
+from exception import DuplicatedResourceException, handle_unknown_exception
 from services.auth import get_hashed_password
 from models.user import UserPostModel
 from schemas.user import User
@@ -19,9 +19,10 @@ def handle_unique__user_constraint(func):
                 raise DuplicatedResourceException("Username")
             if "uq_email" in str(e.orig):
                 raise DuplicatedResourceException("Email")
-            raise UnknownException()
+            raise e
     return decorate
 
+@handle_unknown_exception
 @handle_unique__user_constraint
 def register_system_admin(db:Session, data:UserPostModel)->User:
     new_user = User(**data.model_dump())
@@ -36,6 +37,7 @@ def register_system_admin(db:Session, data:UserPostModel)->User:
     db.refresh(new_user)
     return new_user
 
+@handle_unknown_exception
 @handle_unique__user_constraint
 def register_admin(db:Session, data:UserPostModel)->User:
     new_user = User(**data.model_dump())
@@ -50,6 +52,7 @@ def register_admin(db:Session, data:UserPostModel)->User:
     
     return new_user
 
+@handle_unknown_exception
 @handle_unique__user_constraint
 def register_company_employee(db:Session, data:UserPostModel, admin:User)->User:
     new_user = User(**data.model_dump())
@@ -64,6 +67,7 @@ def register_company_employee(db:Session, data:UserPostModel, admin:User)->User:
     
     return new_user
 
+@handle_unknown_exception
 @handle_unique__user_constraint
 def register_unaffiliated_user(db:Session, data:UserPostModel)->User:
     new_user = User(**data.model_dump())

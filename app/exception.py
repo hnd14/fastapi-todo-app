@@ -36,3 +36,13 @@ class UnknownException(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
                          detail="Something went wrong.")
+        
+def handle_unknown_exception(func):
+    def decorate(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except HTTPException as e:
+            raise e
+        except:
+            raise UnknownException()
+    return decorate
