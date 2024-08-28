@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from exception import JWTTokenException, UnauthorizedException
 from schemas import User
-from settings import JWT_ALGORITHM, JWT_SECRET, SYSTEM_COMPANY_ID
+from settings import JWT_ALGORITHM, JWT_SECRET, SYSTEM_COMPANY_ID, NONE_COMPANY_ID
 
 bcrypt_context = CryptContext(schemes=["bcrypt"])
 
@@ -65,8 +65,11 @@ def token_interceptor(token: str = Depends(oa2_bearer)) -> User:
     except JWTError:
         raise JWTTokenException()
 
-def requires_system_admin(func):
-    def decorate(user: User, *args, **kwargs):
-        if user.company_id != UUID(SYSTEM_COMPANY_ID) or not user.is_admin:
-            raise UnauthorizedException()
-        return func(user, *args, **kwargs)
+def requires_system_admin(user: User):
+    if user.company_id != UUID(SYSTEM_COMPANY_ID) or not user.is_admin:
+        raise UnauthorizedException
+
+
+def requires_company_admin(user: User):
+    if user.company_id == UUID(SYSTEM_COMPANY_ID) or user.company_id == UUID(NONE_COMPANY_ID) or not user.is_admin:
+        raise UnauthorizedException
