@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from exception import DuplicatedResourceException, UnauthorizedException, handle_unknown_exception
-from services.auth import get_hashed_password
+from services.auth import get_hashed_password, verify_password
 from models.user import UserPostModel, UserPatchInfoModel, UserPatchPasswordModel
 from schemas.user import User
 from settings import SYSTEM_COMPANY_ID, NONE_COMPANY_ID
@@ -121,3 +121,12 @@ def update_user_info(db: Session, user_id:UUID, data: UserPatchInfoModel, user: 
     db.refresh(user_to_update)
     
     return user_to_update
+
+@handle_unknown_exception
+def update_password(db: Session, data: UserPatchPasswordModel, user: User):
+    user_to_update = get_user_by_id(db, user.id)
+    if verify_password(data.new_password, user_to_update.password):
+        raise UnauthorizedException()
+    user_to_update.password = get_hashed_password(data.new_password)
+    db.commit()
+    

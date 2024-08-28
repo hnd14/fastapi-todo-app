@@ -51,6 +51,12 @@ def edit_employee_info(request: UserPatchInfoModel,
                        user: User = Depends(token_interceptor)):
     return UserService.update_user_info(db, user.id, request, user)
 
+@router.patch("/password/me", status_code=status.HTTP_204_NO_CONTENT)
+def edit_employee_info(request: UserPatchPasswordModel,
+                       db: Session = Depends(get_db_context),
+                       user: User = Depends(token_interceptor)):
+    return UserService.update_password(db, request, user)
+
 @router.patch("/info/employees/{id}")
 def edit_employee_info(id: UUID, 
                        request: UserPatchInfoModel,
