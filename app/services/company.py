@@ -10,7 +10,7 @@ from models.company import CompanyPostModel
 from schemas import Company
 from exception import ResourceNotFoundException, InvalidActionException
 
-def handle_unique__company_constraint(func):
+def handle_unique_company_constraint(func):
     def decorate(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -20,6 +20,7 @@ def handle_unique__company_constraint(func):
             raise e
     return decorate
 
+@handle_unknown_exception
 def find_all_company_with_filter(db: Session, /, *, search_kw = "", page_size = 10, page_number = 1) -> List[Company]:
     query = select(Company).where(Company.name.like(f"%{search_kw}%"))\
             .offset((page_number-1)*page_size) \
@@ -27,7 +28,7 @@ def find_all_company_with_filter(db: Session, /, *, search_kw = "", page_size = 
     return db.scalars(query).all()
 
 @handle_unknown_exception
-@handle_unique__company_constraint
+@handle_unique_company_constraint
 def create_company(db: Session, data: CompanyPostModel) -> Company:
     company = Company(**data.model_dump())
     company.created_at = datetime.now(timezone.utc)
@@ -39,12 +40,14 @@ def create_company(db: Session, data: CompanyPostModel) -> Company:
     
     return company
 
+@handle_unknown_exception
 def get_company_by_id(db: Session, id: UUID) -> Company:
     query = select(Company).filter(Company.id == id)
     
     return db.scalars(query).first()
 
-@handle_unique__company_constraint
+@handle_unknown_exception
+@handle_unique_company_constraint
 def update_company(db: Session, id:UUID, data: CompanyPostModel) -> Company:
     company = get_company_by_id(db, id)
     
@@ -61,6 +64,7 @@ def update_company(db: Session, id:UUID, data: CompanyPostModel) -> Company:
     
     return company
 
+@handle_unknown_exception
 def delete_company(db: Session, id:UUID):
     company = get_company_by_id(db, id)
     

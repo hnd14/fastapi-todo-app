@@ -25,7 +25,17 @@ class UserPostModel(BaseModel):
             }
         }
         
+class UserPatchInfoModel(BaseModel):
+    email: str = Field(pattern=".+@.+\..+", default=None)
+    first_name: str = Field(min_length=1, default=None) 
+    last_name: str = Field(min_length=1, default=None)
+    
+class UserPatchPasswordModel(BaseModel):
+    old_password: str
+    new_password: str = Field(min_length=8)
+        
 class UserViewModel(BaseModel):
+    id: UUID
     email: str
     username: str
     first_name: str
@@ -33,3 +43,5 @@ class UserViewModel(BaseModel):
     is_active: bool
     is_admin: bool 
     company_id: UUID
+    created_at: datetime
+    updated_at: datetime

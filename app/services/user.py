@@ -5,26 +5,35 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from exception import DuplicatedResourceException, handle_unknown_exception
+from exception import DuplicatedResourceException, UnauthorizedException, handle_unknown_exception
 from services.auth import get_hashed_password
-from models.user import UserPostModel
+from models.user import UserPostModel, UserPatchInfoModel, UserPatchPasswordModel
 from schemas.user import User
 from settings import SYSTEM_COMPANY_ID, NONE_COMPANY_ID
 
-def handle_unique__user_constraint(func):
+def handle_unique_username_constraint(func):
     def decorate(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except IntegrityError as e:
             if "uq_user_name" in str(e.orig):
                 raise DuplicatedResourceException("Username")
+            raise e
+    return decorate
+
+def handle_unique_email_constraint(func):
+    def decorate(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except IntegrityError as e:
             if "uq_email" in str(e.orig):
                 raise DuplicatedResourceException("Email")
             raise e
     return decorate
 
 @handle_unknown_exception
-@handle_unique__user_constraint
+@handle_unique_username_constraint
+@handle_unique_email_constraint
 def register_system_admin(db:Session, data:UserPostModel)->User:
     new_user = User(**data.model_dump())
     new_user.password = get_hashed_password(data.password)
@@ -39,7 +48,8 @@ def register_system_admin(db:Session, data:UserPostModel)->User:
     return new_user
 
 @handle_unknown_exception
-@handle_unique__user_constraint
+@handle_unique_username_constraint
+@handle_unique_email_constraint
 def register_admin(db:Session, data:UserPostModel)->User:
     new_user = User(**data.model_dump())
     new_user.password = get_hashed_password(data.password)
@@ -54,7 +64,8 @@ def register_admin(db:Session, data:UserPostModel)->User:
     return new_user
 
 @handle_unknown_exception
-@handle_unique__user_constraint
+@handle_unique_username_constraint
+@handle_unique_email_constraint
 def register_company_employee(db:Session, data:UserPostModel, admin:User)->User:
     new_user = User(**data.model_dump())
     new_user.password = get_hashed_password(data.password)
@@ -69,7 +80,8 @@ def register_company_employee(db:Session, data:UserPostModel, admin:User)->User:
     return new_user
 
 @handle_unknown_exception
-@handle_unique__user_constraint
+@handle_unique_username_constraint
+@handle_unique_email_constraint
 def register_unaffiliated_user(db:Session, data:UserPostModel)->User:
     new_user = User(**data.model_dump())
     new_user.password = get_hashed_password(data.password)
@@ -83,6 +95,29 @@ def register_unaffiliated_user(db:Session, data:UserPostModel)->User:
     
     return new_user
 
-def get_all_employees(db:Session, company_id: UUID):
+@handle_unknown_exception
+def get_all_employees(db: Session, company_id: UUID):
     query = select(User).where(User.company_id == company_id)
     return db.scalars(query).all()
+
+@handle_unknown_exception
+def get_user_by_id(db: Session, id: UUID) -> User:
+    query = select(User).filter(User.id == id)
+    
+    return db.scalars(query).first() 
+
+@handle_unknown_exception
+@handle_unique_email_constraint
+def update_user_info(db: Session, user_id:UUID, data: UserPatchInfoModel, user: User):
+    user_to_update = get_user_by_id(db, user_id)
+    if not user_to_update.company_id == user.company_id:
+        raise UnauthorizedException
+    
+    user_to_update.first_name = data.first_name if data.first_name else user_to_update.first_name
+    user_to_update.last_name = data.last_name if data.last_name else user_to_update.last_name
+    user_to_update.email = data.email if data.email else user_to_update.email
+    
+    db.commit()
+    db.refresh(user_to_update)
+    
+    return user_to_update

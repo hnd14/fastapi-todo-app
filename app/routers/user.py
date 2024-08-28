@@ -1,10 +1,11 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from database import get_db_context
-from models.user import UserPostModel, UserViewModel
+from models.user import UserPostModel, UserViewModel, UserPatchInfoModel, UserPatchPasswordModel
 from services import user as UserService
 from services.auth import requires_system_admin, token_interceptor, requires_company_admin
 from schemas.user import User
@@ -43,3 +44,17 @@ def get_all_employees_from_same_company(db: Session = Depends(get_db_context),
                             user:User = Depends(token_interceptor)):
     requires_company_admin(user)
     return UserService.get_all_employees(db, user.company_id)
+
+@router.patch("/info/me")
+def edit_employee_info(request: UserPatchInfoModel,
+                       db: Session = Depends(get_db_context),
+                       user: User = Depends(token_interceptor)):
+    return UserService.update_user_info(db, user.id, request, user)
+
+@router.patch("/info/employees/{id}")
+def edit_employee_info(id: UUID, 
+                       request: UserPatchInfoModel,
+                       db: Session = Depends(get_db_context),
+                       user: User = Depends(token_interceptor)):
+    requires_company_admin(user)
+    return UserService.update_user_info(db, id, request, user)
