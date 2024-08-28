@@ -26,3 +26,13 @@ class ForbiddenOperationException(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, 
                          detail="This operation cannot be executed")
+
+class DuplicatedResourceException(HTTPException):
+    def __init__(self, type:str = "Resource"):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, 
+                         detail=f"{type} already existed")
+        
+class UnknownException(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                         detail="Something went wrong.")

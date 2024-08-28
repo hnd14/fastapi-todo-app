@@ -37,6 +37,8 @@ def upgrade() -> None:
                     sa.Column("updated_at", sa.DateTime, nullable=False),
                     sa.Column("company_id", sa.Uuid, nullable=False))
     op.create_foreign_key("fk_users_comp", "users", "companies", ["company_id"], ["id"])
+    op.create_unique_constraint('uq_user_name', 'users', ['username'])
+    op.create_unique_constraint('uq_email', 'users', ['email'])
     
     op.bulk_insert(user_table, [{
         "id" : uuid4(),

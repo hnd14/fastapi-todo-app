@@ -8,8 +8,8 @@ from database import Base
 class User(Base, BaseEntity):
     __tablename__ = "users"
     
-    email = Column(String, nullable=False)
-    username = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    username = Column(String, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     password = Column(String, nullable=False)
