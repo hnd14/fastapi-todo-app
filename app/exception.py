@@ -40,7 +40,7 @@ class UnknownException(HTTPException):
 def handle_unknown_exception(func):
     def decorate(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except HTTPException as e:
             raise e
         except:

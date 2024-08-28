@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -13,7 +14,7 @@ from settings import SYSTEM_COMPANY_ID, NONE_COMPANY_ID
 def handle_unique__user_constraint(func):
     def decorate(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except IntegrityError as e:
             if "uq_user_name" in str(e.orig):
                 raise DuplicatedResourceException("Username")
@@ -81,3 +82,7 @@ def register_unaffiliated_user(db:Session, data:UserPostModel)->User:
     db.refresh(new_user)
     
     return new_user
+
+def get_all_employees(db:Session, company_id: UUID):
+    query = select(User).where(User.company_id == company_id)
+    return db.scalars(query).all()

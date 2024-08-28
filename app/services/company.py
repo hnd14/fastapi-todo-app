@@ -13,7 +13,7 @@ from exception import ResourceNotFoundException, InvalidActionException
 def handle_unique__company_constraint(func):
     def decorate(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except IntegrityError as e:
             if "uq_company_name" in str(e.orig):
                 raise DuplicatedResourceException("Company name")
