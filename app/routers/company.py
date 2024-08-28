@@ -1,13 +1,15 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from database import get_db_context
-from exception import ResourceNotFoundException
+from exception import ResourceNotFoundException, ForbiddenOperationException
 from models.company import CompanyViewModel, CompanyPostModel
 from schemas.user import User
 from services import  company as CompanyService, auth as AuthService
 from services.auth import requires_system_admin
+from settings import SYSTEM_COMPANY_ID, NONE_COMPANY_ID
 
 router = APIRouter(prefix="/companies", tags=["Companies"])
 
@@ -32,6 +34,8 @@ def create_company(request: CompanyPostModel,
 @router.put("/{id}", response_model=CompanyViewModel)
 def update_company(id: UUID, request: CompanyPostModel, db: Session = Depends(get_db_context), 
                    user: User = Depends(AuthService.token_interceptor)):
+    if id == UUID(SYSTEM_COMPANY_ID) or id == UUID(NONE_COMPANY_ID):
+        raise ForbiddenOperationException
     return CompanyService.update_company(db, id, request)
 
 @router.get("/{id}", response_model=CompanyViewModel)
@@ -45,4 +49,6 @@ def get_one_company(id: UUID, db: Session = Depends(get_db_context)):
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 def delete_company(id: UUID, db: Session = Depends(get_db_context), 
                    user: User = Depends(AuthService.token_interceptor)):
+    if id == UUID(SYSTEM_COMPANY_ID) or id == UUID(NONE_COMPANY_ID):
+        raise ForbiddenOperationException
     CompanyService.delete_company(db, id)

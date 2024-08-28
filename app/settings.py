@@ -30,3 +30,4 @@ JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM")
 
 # System settings
 SYSTEM_COMPANY_ID = "f8f5a16d-8cee-4360-ba28-bebde9ca8e90"
+NONE_COMPANY_ID = "a2304063-07d3-42b8-aef1-a1c1e58e6ad4"

@@ -21,3 +21,8 @@ class UnauthorizedException(HTTPException):
     def __init__(self):
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, 
                          detail="You don't have permission to use this function.")
+        
+class ForbiddenOperationException(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, 
+                         detail="This operation cannot be executed")

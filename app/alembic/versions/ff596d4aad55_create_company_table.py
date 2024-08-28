@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 
 from schemas.enum import Mode
-from settings import SYSTEM_COMPANY_ID
+from settings import SYSTEM_COMPANY_ID, NONE_COMPANY_ID
 
 
 # revision identifiers, used by Alembic.
@@ -37,6 +37,14 @@ def upgrade() -> None:
             "id":SYSTEM_COMPANY_ID,
             "name": "System management",
             "description": "The system administrators.",
+            "mode": Mode.SYSTEM,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        },
+        {
+            "id":NONE_COMPANY_ID,
+            "name": "None",
+            "description": "Unaffiliated",
             "mode": Mode.SYSTEM,
             "created_at": datetime.now(timezone.utc),
             "updated_at": datetime.now(timezone.utc)
