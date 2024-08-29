@@ -10,6 +10,10 @@ class CompanyPostModel(BaseModel):
     description :str = Field(max_length=255)
     mode: Mode = Field()
     
+class CompanyPatchModel(BaseModel):
+    description :str = Field(max_length=255)
+    mode: Mode = Field()
+    
 class CompanyViewModel(BaseModel):
     id: UUID
     name: str

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db_context
 from exception import ResourceNotFoundException, ForbiddenOperationException
-from models.company import CompanyViewModel, CompanyPostModel
+from models.company import CompanyViewModel, CompanyPostModel, CompanyPatchModel
 from schemas.user import User
 from services import  company as CompanyService
 from services.auth import requires_system_admin, token_interceptor
@@ -29,8 +29,8 @@ def create_company(request: CompanyPostModel,
     requires_system_admin(user)
     return CompanyService.create_company(db, request)
 
-@router.put("/{id}", response_model=CompanyViewModel)
-def update_company(id: UUID, request: CompanyPostModel, db: Session = Depends(get_db_context), 
+@router.patch("/{id}", response_model=CompanyViewModel)
+def update_company(id: UUID, request: CompanyPatchModel, db: Session = Depends(get_db_context), 
                    user: User = Depends(token_interceptor)):
     requires_system_admin(user)
     if id == UUID(SYSTEM_COMPANY_ID) or id == UUID(NONE_COMPANY_ID):

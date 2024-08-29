@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from exception import DuplicatedResourceException, handle_unknown_exception
-from models.company import CompanyPostModel
+from models.company import CompanyPostModel, CompanyPatchModel
 from schemas import Company
 from exception import ResourceNotFoundException, InvalidActionException
 
@@ -48,15 +48,14 @@ def get_company_by_id(db: Session, id: UUID) -> Company:
 
 @handle_unknown_exception
 @handle_unique_company_constraint
-def update_company(db: Session, id:UUID, data: CompanyPostModel) -> Company:
+def update_company(db: Session, id:UUID, data: CompanyPatchModel) -> Company:
     company = get_company_by_id(db, id)
     
     if company is None:
         raise ResourceNotFoundException("Company")
     
-    company.name = data.name
-    company.description = data.description
-    company.mode = data.mode
+    company.description = data.description or company.description
+    company.mode = data.mode or company.mode
     company.updated_at = datetime.now(timezone.utc)
     
     db.commit()
