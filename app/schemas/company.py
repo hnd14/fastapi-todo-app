@@ -13,3 +13,4 @@ class Company(Base, BaseEntity):
     mode = Column(Enum(Mode), nullable=True)
     
     employees = relationship("User", back_populates="company")
+    tasks = relationship("Task", back_populates="company")

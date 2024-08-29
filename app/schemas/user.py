@@ -18,5 +18,7 @@ class User(Base, BaseEntity):
     company_id = Column(Uuid, ForeignKey(Company.id))
     
     company = relationship("Company", back_populates="employees")
-    tasks_created = relationship("Task", back_populates="created_by", foreign_keys="Task.created_by_id")
-    tasks_assigned = relationship("Task", back_populates="assigned_to", foreign_keys="Task.assigned_to_id")
+    tasks_created = relationship("Task", back_populates="created_by",
+                                 foreign_keys="Task.created_by_id")
+    tasks_assigned = relationship("Task", back_populates="assigned_to",
+                                  foreign_keys="Task.assigned_to_id")
