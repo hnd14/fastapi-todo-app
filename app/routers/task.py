@@ -5,7 +5,7 @@ from fastapi import Depends, APIRouter, status, Query
 from sqlalchemy.orm import Session
 
 from database import get_db_context
-from models.task import TaskPostModel, TaskViewModel
+from models.task import TaskPostModel, TaskViewModel, TaskAssigneePatchModel, TaskInfoPatchModel
 from schemas.enum import Status
 from schemas.user import User
 from services import task as TaskService
@@ -40,3 +40,19 @@ def get_my_created_tasks(status: Status | None = Query(default=None),
                           db: Session = Depends(get_db_context),
                           user: User = Depends(token_interceptor)):
     return TaskService.find_task_with_filters(db, None, user.id, status, user)
+
+@router.patch("/info/{id}", response_model=TaskViewModel)
+def update_task_info(id: UUID,
+                     request: TaskInfoPatchModel,
+                     db: Session = Depends(get_db_context),
+                     user: User = Depends(token_interceptor)):
+    requires_company_admin(user)
+    return TaskService.update_task_info(db, id, request)
+
+@router.patch("/assignee/{id}", response_model=TaskViewModel)
+def update_task_info(id: UUID,
+                     request: TaskAssigneePatchModel,
+                     db: Session = Depends(get_db_context),
+                     user: User = Depends(token_interceptor)):
+    requires_company_admin(user)
+    return TaskService.update_task_assignee(db, id, request, user)

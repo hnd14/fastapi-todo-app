@@ -9,7 +9,7 @@ from exception import InvalidActionException, ResourceNotFoundException
 from schemas.task import Task
 from schemas.user import User
 from services.user import get_user_by_id
-from models.task import TaskPostModel
+from models.task import TaskPostModel, TaskAssigneePatchModel, TaskInfoPatchModel
 
 def verify_assignee(assignee: User, user: User):
     if assignee.company_id != user.company_id:
@@ -48,3 +48,42 @@ def find_task_with_filters(db: Session,
     query = query.filter_by(company_id = user.company_id)
     
     return db.scalars(query).all()
+
+def get_task_by_id(db: Session, id: UUID):
+    return db.scalars(select(Task).filter_by(id=id)).first()
+
+def update_task_assignee(db: Session, id: UUID, data: TaskAssigneePatchModel, user: User):
+    assignee = get_user_by_id(db, data.assigned_to_id)
+    
+    if assignee is None:
+        raise ResourceNotFoundException("Assignee")
+    
+    verify_assignee(assignee, user)
+        
+    task = get_task_by_id(db, id)
+    
+    if task is None:
+        raise ResourceNotFoundException("Task")
+    
+    task.assigned_to_id = data.assigned_to_id
+    
+    db.commit()
+    db.refresh(task)
+    
+    return task
+    
+def update_task_info(db: Session, id: UUID, data: TaskInfoPatchModel):
+    task = get_task_by_id(db, id)
+    
+    if task is None:
+        raise ResourceNotFoundException("Task")
+    
+    task.priority = data.priority or task.priority
+    task.title = data.title or task.title
+    task.summary = data.summary or task.summary
+    task.status = data.status or task.status
+    
+    db.commit()
+    db.refresh(task)
+    
+    return task

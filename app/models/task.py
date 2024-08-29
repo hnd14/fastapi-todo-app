@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
 
@@ -11,6 +12,15 @@ class TaskPostModel(BaseModel):
     status: Status = Field(default=Status.NEW)
     priority: Priority = Field(default=Priority.MEDIUM)
     assigned_to_id: UUID = Field(default=None)
+    
+class TaskInfoPatchModel(BaseModel):
+    title: str | None  = Field(min_length=1)
+    summary: str | None = Field(default=None)
+    priority: Priority | None
+    status: Status | None
+    
+class TaskAssigneePatchModel(BaseModel):
+    assigned_to_id: UUID
     
 class TaskViewModel(BaseModel):
     id: UUID
