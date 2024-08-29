@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
-from exception import DuplicatedResourceException, UnauthorizedException, handle_unknown_exception
+from exception import DuplicatedResourceException, UnauthorizedException, ResourceNotFoundException, InvalidActionException, handle_unknown_exception
 from services.auth import get_hashed_password, verify_password
 from models.user import UserPostModel, UserPatchInfoModel, UserPatchPasswordModel
 from schemas.user import User
@@ -113,9 +113,9 @@ def update_user_info(db: Session, user_id:UUID, data: UserPatchInfoModel, user: 
     if not user_to_update.company_id == user.company_id:
         raise UnauthorizedException
     
-    user_to_update.first_name = data.first_name if data.first_name else user_to_update.first_name
-    user_to_update.last_name = data.last_name if data.last_name else user_to_update.last_name
-    user_to_update.email = data.email if data.email else user_to_update.email
+    user_to_update.first_name = data.first_name or user_to_update.first_name
+    user_to_update.last_name = data.last_name or user_to_update.last_name
+    user_to_update.email = data.email or user_to_update.email
     
     db.commit()
     db.refresh(user_to_update)
@@ -129,4 +129,35 @@ def update_password(db: Session, data: UserPatchPasswordModel, user: User):
         raise UnauthorizedException()
     user_to_update.password = get_hashed_password(data.new_password)
     db.commit()
+
+@handle_unknown_exception
+def add_to_company(db:Session, employee_id: UUID, user: User):
+    employee = get_user_by_id(db, employee_id)
+    if employee is None:
+        raise ResourceNotFoundException("User")
     
+    if employee.company_id != UUID(NONE_COMPANY_ID):
+        raise InvalidActionException("User belongs to another company")
+    
+    employee.company_id = user.company_id
+    
+    db.commit()
+    db.refresh(employee)
+    
+    return employee
+
+@handle_unknown_exception
+def remove_from_company(db:Session, employee_id: UUID, user: User):
+    employee = get_user_by_id(db, employee_id)
+    if employee is None:
+        raise ResourceNotFoundException("User")
+    
+    if employee.company_id != user.company_id:
+        raise InvalidActionException("User belongs to another company")
+    
+    employee.company_id = UUID(NONE_COMPANY_ID)
+    
+    db.commit()
+    db.refresh(employee)
+    
+    return employee

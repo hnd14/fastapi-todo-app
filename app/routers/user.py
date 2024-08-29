@@ -64,3 +64,17 @@ def edit_employee_info(id: UUID,
                        user: User = Depends(token_interceptor)):
     requires_company_admin(user)
     return UserService.update_user_info(db, id, request, user)
+
+@router.patch("/add-to-company/employees/{id}")
+def edit_employee_info(id: UUID,
+                       db: Session = Depends(get_db_context),
+                       user: User = Depends(token_interceptor)):
+    requires_company_admin(user)
+    return UserService.add_to_company(db, id, user)
+
+@router.patch("/remove-from-company/employees/{id}")
+def edit_employee_info(id: UUID,
+                       db: Session = Depends(get_db_context),
+                       user: User = Depends(token_interceptor)):
+    requires_company_admin(user)
+    return UserService.remove_from_company(db, id, user)
