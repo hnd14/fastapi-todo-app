@@ -36,7 +36,7 @@ def get_my_assigned_tasks(status: Status | None = Query(default=None),
     return TaskService.find_task_with_filters(db, user.id, None, status, user)
 
 @router.get("/me/created", response_model=List[TaskViewModel])
-def get_my_assigned_tasks(status: Status | None = Query(default=None),
+def get_my_created_tasks(status: Status | None = Query(default=None),
                           db: Session = Depends(get_db_context),
                           user: User = Depends(token_interceptor)):
     return TaskService.find_task_with_filters(db, None, user.id, status, user)
