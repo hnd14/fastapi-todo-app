@@ -16,6 +16,7 @@ class TaskViewModel(BaseModel):
     id: UUID
     title: str
     summary: str
+    status: Status
     priority: Priority
     
     created_by: UserViewModel
