@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from schemas.enum import Status
-from exception import InvalidActionException, ResourceNotFoundException
+from exception import InvalidActionException, ResourceNotFoundException, handle_unknown_exception
 from schemas.task import Task
 from schemas.user import User
 from services.user import get_user_by_id
@@ -15,6 +15,7 @@ def verify_assignee(assignee: User, user: User):
     if assignee.company_id != user.company_id:
         raise InvalidActionException("You cannot assign task to a user from a different company")
 
+@handle_unknown_exception
 def create_task(db:Session, data: TaskPostModel, user: User):
     assignee = get_user_by_id(db, data.assigned_to_id)
     
@@ -36,6 +37,7 @@ def create_task(db:Session, data: TaskPostModel, user: User):
     
     return task
 
+@handle_unknown_exception
 def find_task_with_filters(db: Session,
                            assignee_id: UUID | None, 
                            creator_id: UUID | None,
@@ -49,9 +51,11 @@ def find_task_with_filters(db: Session,
     
     return db.scalars(query).all()
 
+@handle_unknown_exception
 def get_task_by_id(db: Session, id: UUID):
     return db.scalars(select(Task).filter_by(id=id)).first()
 
+@handle_unknown_exception
 def update_task_assignee(db: Session, id: UUID, data: TaskAssigneePatchModel, user: User):
     assignee = get_user_by_id(db, data.assigned_to_id)
     
@@ -72,6 +76,7 @@ def update_task_assignee(db: Session, id: UUID, data: TaskAssigneePatchModel, us
     
     return task
     
+@handle_unknown_exception
 def update_task_info(db: Session, id: UUID, data: TaskInfoPatchModel):
     task = get_task_by_id(db, id)
     

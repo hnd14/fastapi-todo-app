@@ -14,10 +14,10 @@ class TaskPostModel(BaseModel):
     assigned_to_id: UUID = Field(default=None)
     
 class TaskInfoPatchModel(BaseModel):
-    title: str | None  = Field(min_length=1)
-    summary: str | None = Field(default=None)
-    priority: Priority | None
-    status: Status | None
+    title: str | None  = Field(min_length=1, default=None)
+    summary: str | None = None
+    priority: Priority | None = None
+    status: Status | None = None
     
 class TaskAssigneePatchModel(BaseModel):
     assigned_to_id: UUID

@@ -30,6 +30,15 @@ class UserPatchInfoModel(BaseModel):
     first_name: str = Field(min_length=1, default=None) 
     last_name: str = Field(min_length=1, default=None)
     
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "example@sample.com",
+                "first_name": "example",
+                "last_name": "user"
+            }
+        }
+    
 class UserPatchPasswordModel(BaseModel):
     old_password: str
     new_password: str = Field(min_length=8)

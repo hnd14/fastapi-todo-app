@@ -10,9 +10,22 @@ class CompanyPostModel(BaseModel):
     description :str = Field(max_length=255)
     mode: Mode = Field()
     
+    class Config:
+        json_schema_extra = {
+            "name": "NT",
+            "description": "Delivering technology excellence",
+            "mode": "Hybrid"
+        }
+    
 class CompanyPatchModel(BaseModel):
-    description :str = Field(max_length=255)
-    mode: Mode = Field()
+    description :str = Field(max_length=255, default=None)
+    mode: Mode = Field(default=None)
+    
+    class Config:
+        json_schema_extra = {
+            "description": "Delivering technology excellence",
+            "mode": "Hybrid"
+        }
     
 class CompanyViewModel(BaseModel):
     id: UUID
