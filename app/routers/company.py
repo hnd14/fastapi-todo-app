@@ -25,14 +25,12 @@ def find_all_company_with_filter(*, search_kw: str = Query(default=""),
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=CompanyViewModel)
 def create_company(request: CompanyPostModel,
                    db: Session = Depends(get_db_context),
-                   user: User = Depends(token_interceptor)):
-    requires_system_admin(user)
+                   _: User = Depends(token_interceptor(requires_system_admin))):
     return CompanyService.create_company(db, request)
 
 @router.patch("/{id}", response_model=CompanyViewModel)
 def update_company(id: UUID, request: CompanyPatchModel, db: Session = Depends(get_db_context), 
-                   user: User = Depends(token_interceptor)):
-    requires_system_admin(user)
+                   _: User = Depends(token_interceptor(requires_system_admin))):
     if id == UUID(SYSTEM_COMPANY_ID) or id == UUID(NONE_COMPANY_ID):
         raise ForbiddenOperationException
     return CompanyService.update_company(db, id, request)
@@ -46,8 +44,7 @@ def get_one_company(id: UUID, db: Session = Depends(get_db_context)):
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 def delete_company(id: UUID, db: Session = Depends(get_db_context), 
-                   user: User = Depends(token_interceptor)):
-    requires_system_admin(user)
+                   _: User = Depends(token_interceptor(requires_system_admin))):
     if id == UUID(SYSTEM_COMPANY_ID) or id == UUID(NONE_COMPANY_ID):
         raise ForbiddenOperationException()
     CompanyService.delete_company(db, id)

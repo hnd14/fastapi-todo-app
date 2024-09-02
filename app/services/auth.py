@@ -48,28 +48,35 @@ def create_access_token(user: User, expires: Optional[timedelta] = None):
     claims.update({"exp": expire})
     return jwt.encode(claims, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-def token_interceptor(token: str = Depends(oa2_bearer)) -> User:
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user = User()
-        user.username = payload.get("sub")
-        user.id = UUID(payload.get("id"))
-        user.first_name = payload.get("first_name")
-        user.last_name = payload.get("last_name")
-        user.is_admin = payload.get("is_admin")
-        user.company_id = UUID(payload.get("company_id"))
-        
-        if user.username is None or user.id is None:
+def token_interceptor(verifier = None):
+    def intercept(token: str = Depends(oa2_bearer)):
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+            user = User()
+            user.username = payload.get("sub")
+            user.id = UUID(payload.get("id"))
+            user.first_name = payload.get("first_name")
+            user.last_name = payload.get("last_name")
+            user.is_admin = payload.get("is_admin")
+            user.company_id = UUID(payload.get("company_id"))
+            
+            if user.username is None or user.id is None:
+                raise JWTTokenException()
+            
+            if verifier is not None:
+                verifier(user)
+            return user
+        except JWTError:
             raise JWTTokenException()
-        return user
-    except JWTError:
-        raise JWTTokenException()
+        except UnauthorizedException:
+            raise UnauthorizedException()
+    return intercept
 
 def requires_system_admin(user: User):
     if user.company_id != UUID(SYSTEM_COMPANY_ID) or not user.is_admin:
-        raise UnauthorizedException
+        raise UnauthorizedException()
 
 
 def requires_company_admin(user: User):
     if user.company_id == UUID(SYSTEM_COMPANY_ID) or user.company_id == UUID(NONE_COMPANY_ID) or not user.is_admin:
-        raise UnauthorizedException
+        raise UnauthorizedException()

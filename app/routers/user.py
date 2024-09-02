@@ -15,23 +15,20 @@ router = APIRouter(prefix="/users", tags=["Users"])
 @router.post("/system-admin", response_model=UserViewModel, status_code=status.HTTP_201_CREATED)
 def register_system_admin(request:UserPostModel, 
                           db: Session = Depends(get_db_context),
-                          user:User = Depends(token_interceptor)):
-    requires_system_admin(user)
+                          user:User = Depends(token_interceptor(requires_system_admin))):
     return UserService.register_system_admin(db, request)
 
 
 @router.post("/company-admin", response_model=UserViewModel, status_code=status.HTTP_201_CREATED)
 def register_company_admin(request:UserPostModel, 
                           db: Session = Depends(get_db_context),
-                          user:User = Depends(token_interceptor)):
-    requires_system_admin(user)
+                          user:User = Depends(token_interceptor(requires_system_admin))):
     return UserService.register_admin(db, request)
 
 @router.post("/employee", response_model=UserViewModel, status_code=status.HTTP_201_CREATED)
 def register_company_employee(request:UserPostModel, 
                           db: Session = Depends(get_db_context),
-                          user:User = Depends(token_interceptor)):
-    requires_company_admin(user)
+                          user:User = Depends(token_interceptor(requires_company_admin))):
     return UserService.register_company_employee(db, request, user)
 
 @router.post("/unaffiliated", response_model=UserViewModel, status_code=status.HTTP_201_CREATED)
@@ -41,8 +38,7 @@ def register_unaffiliated_user(request:UserPostModel,
     
 @router.get("/employees", response_model=List[UserViewModel])
 def get_all_employees_from_same_company(db: Session = Depends(get_db_context),
-                            user:User = Depends(token_interceptor)):
-    requires_company_admin(user)
+                            user:User = Depends(token_interceptor(requires_company_admin))):
     return UserService.get_all_employees(db, user.company_id)
 
 @router.patch("/info/me")
@@ -61,20 +57,17 @@ def edit_employee_info(request: UserPatchPasswordModel,
 def edit_employee_info(id: UUID, 
                        request: UserPatchInfoModel,
                        db: Session = Depends(get_db_context),
-                       user: User = Depends(token_interceptor)):
-    requires_company_admin(user)
+                       user: User = Depends(token_interceptor(requires_company_admin))):
     return UserService.update_user_info(db, id, request, user)
 
 @router.patch("/add-to-company/employees/{id}")
 def edit_employee_info(id: UUID,
                        db: Session = Depends(get_db_context),
-                       user: User = Depends(token_interceptor)):
-    requires_company_admin(user)
+                       user: User = Depends(token_interceptor(requires_company_admin))):
     return UserService.add_to_company(db, id, user)
 
 @router.patch("/remove-from-company/employees/{id}")
 def edit_employee_info(id: UUID,
                        db: Session = Depends(get_db_context),
-                       user: User = Depends(token_interceptor)):
-    requires_company_admin(user)
+                       user: User = Depends(token_interceptor(requires_company_admin))):
     return UserService.remove_from_company(db, id, user)
