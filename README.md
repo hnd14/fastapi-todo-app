@@ -29,7 +29,7 @@ pip install -r requirements.txt
 docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=<your-preferred-one> -d postgres:<your-preferred-version>
 ```
 ## Configure `.env` file by creating a copy from `.env.sample`
-- Change the information according to your postgres instance.
+- Make a `.env` file that is a copy of the `.env.sample` file. You can access the `.env.sample` file under the `app` directory. Change the information in the `.env` file according to your postgres instance.
 ## Apply migration to your database
 - At `app` directory, run `alembic` migration command. Please make sure your postgres DB is ready and accessible.
 ```bash
