@@ -33,6 +33,9 @@ docker run -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=<your-preferred-one
 ## Apply migration to your database
 - At `app` directory, run `alembic` migration command. Please make sure your postgres DB is ready and accessible.
 ```bash
+# Migrate to a specific revision
+alembic upgrade <revision_number>
+
 # Migrate to latest revison
 alembic upgrade head
 
