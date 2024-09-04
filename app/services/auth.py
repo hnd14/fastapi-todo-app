@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from exception import JWTTokenException, UnauthorizedException
-from schemas import User
+from schemas.user import User
 from settings import JWT_ALGORITHM, JWT_SECRET, SYSTEM_COMPANY_ID, NONE_COMPANY_ID
 
 bcrypt_context = CryptContext(schemes=["bcrypt"])

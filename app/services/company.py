@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 from exception import DuplicatedResourceException, handle_unknown_exception
 from models.company import CompanyPostModel, CompanyPatchModel
-from schemas import Company
+from schemas.company import Company
 from exception import ResourceNotFoundException, InvalidActionException
 
 def handle_unique_company_constraint(func):
