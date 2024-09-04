@@ -54,3 +54,4 @@ uvicorn main:app
 ```
 ## Access the api documentations
 - The api documentations is available at `http://localhost:<uvicorn-port>/docs` after the `uvicorn` server has started.
+- The default user username is `todo_admin`, the default user password should be provided in the `.env` file
