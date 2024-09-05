@@ -54,4 +54,5 @@ uvicorn main:app
 ```
 ## Access the api documentations
 - The api documentations is available at `http://localhost:<uvicorn-port>/docs` after the `uvicorn` server has started.
-- The default user username is `todo_admin`, the default user password should be provided in the `.env` file
+- The default user username is `todo_admin`, the default user password should be provided in the `.env` file. This user has the role of system admin. This user can perform actions that will affect the system as a whole.
+- Another sample user with role company admin is generated with username `company_admin` and the same password as the default user. This user can be used to access other functions related to his company operations. 
