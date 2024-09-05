@@ -13,7 +13,7 @@ from alembic import op
 import sqlalchemy as sa
 
 from services.auth import get_hashed_password
-from settings import ADMIN_DEFAULT_PASSWORD, SYSTEM_COMPANY_ID
+from settings import ADMIN_DEFAULT_PASSWORD, SYSTEM_COMPANY_ID, SAMPLE_COMPANY_ID
 
 
 # revision identifiers, used by Alembic.
@@ -52,6 +52,19 @@ def upgrade() -> None:
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc), 
         "company_id": SYSTEM_COMPANY_ID
+    },
+    {
+        "id" : uuid4(),
+        "email": "admin@company.com",
+        "username": "company_admin",
+        "first_name": "company",
+        "last_name": "admin",
+        "password": get_hashed_password(ADMIN_DEFAULT_PASSWORD),
+        "is_admin": True,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc), 
+        "company_id": SAMPLE_COMPANY_ID
     }])
 
 
