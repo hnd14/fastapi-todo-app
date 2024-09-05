@@ -116,6 +116,8 @@ def update_user_info(db: Session, user_id:UUID, data: UserPatchInfoModel, user: 
     user_to_update.first_name = data.first_name or user_to_update.first_name
     user_to_update.last_name = data.last_name or user_to_update.last_name
     user_to_update.email = data.email or user_to_update.email
+    user_to_update.is_admin = data.is_admin if data.is_admin != None else user_to_update.is_admin
+    user_to_update.is_active = data.is_active if data.is_active != None else user_to_update.is_active
     
     db.commit()
     db.refresh(user_to_update)
@@ -156,6 +158,7 @@ def remove_from_company(db:Session, employee_id: UUID, user: User):
         raise InvalidActionException("User belongs to another company")
     
     employee.company_id = UUID(NONE_COMPANY_ID)
+    employee.is_admin = False
     
     db.commit()
     db.refresh(employee)

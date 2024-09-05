@@ -29,6 +29,8 @@ class UserPatchInfoModel(BaseModel):
     email: str = Field(pattern=".+@.+\..+", default=None)
     first_name: str = Field(min_length=1, default=None) 
     last_name: str = Field(min_length=1, default=None)
+    is_active: bool|None = Field(default=None)
+    is_admin: bool|None = Field(default=None) 
     
     class Config:
         json_schema_extra = {
